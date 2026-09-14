@@ -1,0 +1,587 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
+
+  <meta name="theme-color" content="#4f46e5">
+
+  <link rel="manifest" href="manifest.json">
+
+  <title>GK Quiz</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      background: linear-gradient(135deg, #4f46e5, #7c3aed);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .app {
+      width: 100%;
+      max-width: 500px;
+    }
+
+    .screen {
+      background: white;
+      border-radius: 24px;
+      padding: 30px 22px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .logo {
+      width: 110px;
+      height: 110px;
+      border-radius: 25px;
+      object-fit: cover;
+      display: block;
+      margin: 0 auto 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1f2937;
+      font-size: 30px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      text-align: center;
+      color: #6b7280;
+      margin-bottom: 25px;
+      line-height: 1.5;
+    }
+
+    .features {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 25px;
+    }
+
+    .feature {
+      background: #f3f4f6;
+      padding: 15px;
+      border-radius: 15px;
+      text-align: center;
+      color: #374151;
+      font-size: 14px;
+    }
+
+    .feature strong {
+      display: block;
+      font-size: 22px;
+      margin-bottom: 5px;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .start-btn,
+    .next-btn {
+      width: 100%;
+      padding: 16px;
+      border-radius: 14px;
+      background: #4f46e5;
+      color: white;
+      font-size: 18px;
+      font-weight: bold;
+    }
+
+    .start-btn:active,
+    .next-btn:active {
+      transform: scale(0.98);
+    }
+
+    #quiz-screen {
+      display: none;
+    }
+
+    .quiz-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+      color: #4b5563;
+      font-weight: bold;
+    }
+
+    .progress-container {
+      width: 100%;
+      height: 9px;
+      background: #e5e7eb;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 25px;
+    }
+
+    .progress-bar {
+      height: 100%;
+      width: 0%;
+      background: #4f46e5;
+      transition: width 0.3s;
+    }
+
+    .question {
+      font-size: 22px;
+      line-height: 1.4;
+      color: #111827;
+      margin-bottom: 20px;
+    }
+
+    .options {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .option {
+      width: 100%;
+      text-align: left;
+      padding: 15px;
+      border: 2px solid #e5e7eb;
+      border-radius: 14px;
+      background: white;
+      color: #374151;
+      font-size: 16px;
+      transition: 0.2s;
+    }
+
+    .option:hover {
+      border-color: #4f46e5;
+    }
+
+    .option.correct {
+      background: #dcfce7;
+      border-color: #22c55e;
+      color: #166534;
+    }
+
+    .option.wrong {
+      background: #fee2e2;
+      border-color: #ef4444;
+      color: #991b1b;
+    }
+
+    .option:disabled {
+      cursor: not-allowed;
+    }
+
+    .next-btn {
+      display: none;
+    }
+
+    .score-box {
+      text-align: center;
+      padding: 20px 0;
+    }
+
+    .score-number {
+      font-size: 50px;
+      font-weight: bold;
+      color: #4f46e5;
+      margin: 10px 0;
+    }
+
+    @media (max-width: 400px) {
+      .screen {
+        padding: 25px 17px;
+      }
+
+      h1 {
+        font-size: 26px;
+      }
+
+      .question {
+        font-size: 20px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="app">
+
+    <!-- HOME SCREEN -->
+    <div class="screen" id="home-screen">
+
+      <!-- App logo -->
+      <img
+        src="icons/icon-192.png"
+        alt="GK Quiz Logo"
+        class="logo"
+      >
+
+      <h1>GK Quiz</h1>
+
+      <p class="subtitle">
+        Test your General Knowledge and see how much you know!
+      </p>
+
+      <div class="features">
+
+        <div class="feature">
+          <strong>🧠</strong>
+          GK Questions
+        </div>
+
+        <div class="feature">
+          <strong>🏆</strong>
+          Score Points
+        </div>
+
+        <div class="feature">
+          <strong>⚡</strong>
+          Quick Quiz
+        </div>
+
+        <div class="feature">
+          <strong>📚</strong>
+          Learn More
+        </div>
+
+      </div>
+
+      <button class="start-btn" onclick="startQuiz()">
+        Start Quiz 🚀
+      </button>
+
+    </div>
+
+
+    <!-- QUIZ SCREEN -->
+    <div class="screen" id="quiz-screen">
+
+      <div class="quiz-top">
+        <span id="question-number">
+          Question 1/5
+        </span>
+
+        <span id="score">
+          Score: 0
+        </span>
+      </div>
+
+      <div class="progress-container">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+
+      <h2 class="question" id="question">
+        Question will appear here
+      </h2>
+
+      <div class="options" id="options"></div>
+
+      <button
+        class="next-btn"
+        id="next-btn"
+        onclick="nextQuestion()">
+        Next →
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <script>
+
+    // =========================
+    // GK QUESTIONS
+    // =========================
+
+    const questions = [
+
+      {
+        question: "What is the capital of India?",
+        options: [
+          "Mumbai",
+          "New Delhi",
+          "Kolkata",
+          "Chennai"
+        ],
+        answer: 1
+      },
+
+      {
+        question: "Which planet is known as the Red Planet?",
+        options: [
+          "Venus",
+          "Mars",
+          "Jupiter",
+          "Mercury"
+        ],
+        answer: 1
+      },
+
+      {
+        question: "Which is the largest ocean on Earth?",
+        options: [
+          "Atlantic Ocean",
+          "Indian Ocean",
+          "Arctic Ocean",
+          "Pacific Ocean"
+        ],
+        answer: 3
+      },
+
+      {
+        question: "What is the chemical symbol for gold?",
+        options: [
+          "Ag",
+          "Au",
+          "Gd",
+          "Go"
+        ],
+        answer: 1
+      },
+
+      {
+        question: "How many continents are there?",
+        options: [
+          "5",
+          "6",
+          "7",
+          "8"
+        ],
+        answer: 2
+      }
+
+    ];
+
+
+    // =========================
+    // VARIABLES
+    // =========================
+
+    let currentQuestion = 0;
+    let userScore = 0;
+    let answered = false;
+
+
+    // =========================
+    // START QUIZ
+    // =========================
+
+    function startQuiz() {
+
+      currentQuestion = 0;
+      userScore = 0;
+
+      document.getElementById("home-screen").style.display = "none";
+
+      document.getElementById("quiz-screen").style.display = "block";
+
+      loadQuestion();
+    }
+
+
+    // =========================
+    // LOAD QUESTION
+    // =========================
+
+    function loadQuestion() {
+
+      answered = false;
+
+      const questionData = questions[currentQuestion];
+
+      document.getElementById("question-number").textContent =
+        `Question ${currentQuestion + 1}/${questions.length}`;
+
+      document.getElementById("score").textContent =
+        `Score: ${userScore}`;
+
+      document.getElementById("question").textContent =
+        questionData.question;
+
+
+      // Progress bar
+
+      const progress =
+        ((currentQuestion + 1) / questions.length) * 100;
+
+      document.getElementById("progress-bar").style.width =
+        progress + "%";
+
+
+      // Options
+
+      const optionsContainer =
+        document.getElementById("options");
+
+      optionsContainer.innerHTML = "";
+
+
+      questionData.options.forEach((option, index) => {
+
+        const button = document.createElement("button");
+
+        button.className = "option";
+
+        button.textContent = option;
+
+        button.onclick = () => selectAnswer(index, button);
+
+        optionsContainer.appendChild(button);
+
+      });
+
+
+      document.getElementById("next-btn").style.display = "none";
+    }
+
+
+    // =========================
+    // SELECT ANSWER
+    // =========================
+
+    function selectAnswer(index, button) {
+
+      if (answered) return;
+
+      answered = true;
+
+      const correctAnswer =
+        questions[currentQuestion].answer;
+
+      const allOptions =
+        document.querySelectorAll(".option");
+
+
+      allOptions.forEach((option, i) => {
+
+        option.disabled = true;
+
+        if (i === correctAnswer) {
+          option.classList.add("correct");
+        }
+
+      });
+
+
+      if (index === correctAnswer) {
+
+        userScore++;
+
+        button.classList.add("correct");
+
+      } else {
+
+        button.classList.add("wrong");
+
+      }
+
+
+      document.getElementById("score").textContent =
+        `Score: ${userScore}`;
+
+      document.getElementById("next-btn").style.display =
+        "block";
+    }
+
+
+    // =========================
+    // NEXT QUESTION
+    // =========================
+
+    function nextQuestion() {
+
+      currentQuestion++;
+
+      if (currentQuestion < questions.length) {
+
+        loadQuestion();
+
+      } else {
+
+        showResult();
+
+      }
+
+    }
+
+
+    // =========================
+    // RESULT
+    // =========================
+
+    function showResult() {
+
+      document.getElementById("quiz-screen").innerHTML = `
+
+        <div class="score-box">
+
+          <div style="font-size:60px;">
+            🏆
+          </div>
+
+          <h1>Quiz Complete!</h1>
+
+          <p class="subtitle">
+            Your final score is
+          </p>
+
+          <div class="score-number">
+            ${userScore}/${questions.length}
+          </div>
+
+          <button
+            class="start-btn"
+            onclick="location.reload()">
+            Play Again 🔄
+          </button>
+
+        </div>
+
+      `;
+
+    }
+
+
+    // =========================
+    // SERVICE WORKER
+    // =========================
+
+    if ("serviceWorker" in navigator) {
+
+      window.addEventListener("load", () => {
+
+        navigator.serviceWorker.register("./sw.js")
+
+          .then(() => {
+            console.log("Service Worker registered");
+          })
+
+          .catch((error) => {
+            console.log(
+              "Service Worker error:",
+              error
+            );
+          });
+
+      });
+
+    }
+
+  </script>
+
+</body>
+  </html>
